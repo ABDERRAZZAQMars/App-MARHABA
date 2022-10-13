@@ -2,7 +2,7 @@
 // url : api/auth/login
 // acces : Public
 const Login = (req, res) => {
-    res.status(200).send(req.body)
+    res.status(200).send("this a Login Function")
 }
 
 // method : post

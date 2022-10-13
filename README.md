@@ -13,8 +13,8 @@
 • api/user/manager/me => Private : Manager : GET
 -GetUserManger()
 
-• api/user/livreure/me => Private : Livreure : GET
--GetUserLivreure()
+• api/user/livreur /me => Private : Livreur  : GET
+-GetUserlivreur ()
 
 • api/user/client/me => Private : Client : GET
 -GetUserClient()

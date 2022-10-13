@@ -1,14 +1,24 @@
 require('dotenv').config()
-const router = require('./Routes/AuthRoute')
-
 
 const express = require('express')
 const app = express()
 
 app.use(express.json())
 
-app.use('/api/auth', router)
+const Authentification = require('./Routes/AuthRoute');
+const Manager = require('./Routes/ManagerRoute');
+const Livreur = require('./Routes/LivreurRoute');
+const Client = require('./Routes/ClientRoute');
 
+
+//Authentification_Route
+app.use('/api/auth', Authentification);
+//Manger_Route
+app.use('/api/user/manager', Manager);
+//Livreur_Route
+app.use('/api/user/livreur', Livreur);
+//Client_Route
+app.use('/api/user/client', Client);
 
 
 const port = process.env.PORT || 8081
