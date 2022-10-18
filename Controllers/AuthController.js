@@ -9,7 +9,8 @@ const Login = (req, res) => {
 // url : api/auth/register
 // acces : Public
 const Register = (req, res) => {
-    res.status(200).send('this a register function')
+
+    // res.status(200).send('this a register function')
 }
 
 // method : post
