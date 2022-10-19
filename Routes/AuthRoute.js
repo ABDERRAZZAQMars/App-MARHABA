@@ -3,13 +3,14 @@ const router = express.Router()
 
 
 //Les Function Authentification
-const { Login, Register, ForgetPassword, ResetPassword } = require('../Controllers/AuthController')
+const { Login, register, ForgetPassword, ResetPassword } = require('../Controllers/AuthController')
 
 //url : /api/auth
 router.post('/login', Login)
-router.post('/register', Register)
+router.post('/register/', register)
 router.post('/forgetpassword', ForgetPassword)
 router.post('/resetpassword/:token', ResetPassword)
+
 
 
 
