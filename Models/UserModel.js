@@ -25,8 +25,7 @@ const userShema = mongoose.Schema({
     },
     verified: {
         type: Boolean,
-        enum: ['Pending', 'Active'],
-        default: 'Pending'
+        default: false
     }
 }, {
     timestamps: true

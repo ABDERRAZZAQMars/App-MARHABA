@@ -14,7 +14,7 @@ const Login = (req, res) => {
 // url : api/auth/register
 // acces : Public
 const register = asyncHandler(async(req, res) => {
-    const { name, email, password } = req.body
+    const { name, email, password, token, verified } = req.body
     if (!name || !email || !password) {
         res.status(400).json({ message: 'Please ADD All Fields' })
     }
@@ -25,7 +25,6 @@ const register = asyncHandler(async(req, res) => {
         res.status(400)
         throw new Error('User already exists')
     }
-    console.log('ok3');
 
     // Hashed Password
     const salt = await bcrypt.genSalt(10)
@@ -35,14 +34,19 @@ const register = asyncHandler(async(req, res) => {
     const user = await User.create({
         name,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        token: generateToken(),
+        verified
     })
 
     if (user) {
         res.status(201).json({
             _id: user.id,
             name: user.name,
-            email: user.email
+            email: user.email,
+            password: user.password,
+            token: generateToken(user._id),
+            verified: user.verified
         })
 
     } else {
@@ -67,6 +71,12 @@ const ResetPassword = (req, res) => {
     res.status(200).send('this a reset Password function of')
 }
 
+// Generate JSON WEB TOKEN (JWT)
+const generateToken = (id) => {
+    return jwt.sign({ id }, process.env.JWT_SECRET, {
+        expiresIn: '10m',
+    })
+}
 
 module.exports = {
     Login,
