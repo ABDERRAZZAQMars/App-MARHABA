@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
-const user = require('../Models/UserModel')
+const User = require('../Models/UserModel')
 
 // method : post
 // url : api/auth/login
@@ -13,20 +13,44 @@ const Login = (req, res) => {
 // method : post
 // url : api/auth/register
 // acces : Public
-const register = async(req, res) => {
-
-    console.log(req.body);
+const register = asyncHandler(async(req, res) => {
     const { name, email, password } = req.body
     if (!name || !email || !password) {
-        console.log('ok2');
-        res.status(500).json({ message: 'Please ADD All Fields' })
-    } else {
-        console.log('ok3');
-        res.json({ message: 'Register User' })
+        res.status(400).json({ message: 'Please ADD All Fields' })
     }
-    console.log('ok4');
 
-}
+    // Check if user exists
+    userExists = await User.findOne({ email })
+    if (userExists) {
+        res.status(400)
+        throw new Error('User already exists')
+    }
+    console.log('ok3');
+
+    // Hashed Password
+    const salt = await bcrypt.genSalt(10)
+    const hashedPassword = await bcrypt.hash(password, salt)
+
+    // Create User
+    const user = await User.create({
+        name,
+        email,
+        password: hashedPassword
+    })
+
+    if (user) {
+        res.status(201).json({
+            _id: user.id,
+            name: user.name,
+            email: user.email
+        })
+
+    } else {
+        res.status(400)
+        throw new Error('Invalid user data')
+    }
+
+})
 
 // method : post
 // url : api/auth/forgetpassword
@@ -44,10 +68,9 @@ const ResetPassword = (req, res) => {
 }
 
 
-
 module.exports = {
     Login,
     register,
     ForgetPassword,
-    ResetPassword
+    ResetPassword,
 }
