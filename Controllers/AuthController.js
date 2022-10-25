@@ -2,7 +2,9 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcryptjs')
 const asyncHandler = require('express-async-handler')
 const User = require('../Models/UserModel')
+const RoleModel = require('../Models/RoleModel')
 const { sendConfirmationEmail, resetPasswordEmail } = require('../Utils/SendEmail')
+const cookie = require('cookie-parser')
 
 // method : post
 // url : api/auth/login
@@ -12,12 +14,14 @@ const Login = asyncHandler(async(req, res) => {
     const user = await User.findOne({ email })
 
     if (user && (await bcrypt.compare(password, user.password))) {
+        const tokengenerat = generateToken(user._id)
+        res.cookie('access', tokengenerat)
         if (user.verified == true) {
             res.json({
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                token: generateToken(user._id)
+                token: tokengenerat
             })
         } else {
             res.status(401).json({ message: 'User not verified' })
@@ -31,13 +35,15 @@ const Login = asyncHandler(async(req, res) => {
 // url : api/auth/register
 // acces : Public
 const register = asyncHandler(async(req, res) => {
-    const { name, email, password, token, verified } = req.body
+    const { name, email, password, token, verified, role } = req.body
     if (!name || !email || !password) {
         res.status(400).json({ message: 'Please ADD All Fields' })
     }
 
     // Check if user exists
     userExists = await User.findOne({ email })
+    const roles = await RoleModel.findOne({ role })
+    console.log(roles);
     if (userExists) {
         res.status(400).json({ message: 'User already exists' })
     }
@@ -52,7 +58,8 @@ const register = asyncHandler(async(req, res) => {
         email,
         password: hashedPassword,
         token: generateToken(),
-        verified
+        verified,
+        role: roles.id
     })
 
     if (user) {
@@ -134,7 +141,7 @@ const ResetPassword = asyncHandler(async(req, res) => {
 // Generate JSON WEB TOKEN (JWT)
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
-        expiresIn: '10m',
+        expiresIn: '1d',
     })
 }
 

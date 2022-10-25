@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const role = require('../Models/RoleModel')
 
 const userShema = mongoose.Schema({
     name: {
@@ -26,6 +27,10 @@ const userShema = mongoose.Schema({
     verified: {
         type: Boolean,
         default: false
+    },
+    role: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'roles'
     }
 }, {
     timestamps: true

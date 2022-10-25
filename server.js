@@ -11,12 +11,14 @@ const Authentification = require('./Routes/AuthRoute');
 const Manager = require('./Routes/ManagerRoute');
 const Livreur = require('./Routes/LivreurRoute');
 const Client = require('./Routes/ClientRoute');
-//const errorHandler = require('./Middlewares/errorHandler');
-// const { tryCatch } = require('./Utils/tryCatch');
 
+const globalError = require('./Middlewares/errorHandler')
+const apiError = require('./Utils/errorsApi')
+    //const errorHandler = require('./Middlewares/errorHandler');
 
-
-//Authentification_Route
+const cookie = require('cookie-parser')
+app.use(cookie())
+    //Authentification_Route
 app.use('/api/auth', Authentification);
 //Manger_Route
 app.use('/api/user/manager', Manager);
@@ -24,6 +26,14 @@ app.use('/api/user/manager', Manager);
 app.use('/api/user/livreur', Livreur);
 //Client_Route
 app.use('/api/user/client', Client);
+
+
+app.all('*', (req, res, next) => {
+    //create error and send it to error 
+    next(new apiError(`Can't find this route: ${req.originalUrl}`, 400))
+})
+
+app.use(globalError);
 
 //app.use(errorHandler);
 
