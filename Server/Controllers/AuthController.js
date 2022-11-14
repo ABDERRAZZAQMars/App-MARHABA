@@ -35,6 +35,7 @@ const Login = asyncHandler(async(req, res) => {
 // url : api/auth/register
 // acces : Public
 const register = asyncHandler(async(req, res) => {
+
     const { name, email, password, token, verified, role } = req.body
     if (!name || !email || !password) {
         res.status(400).json({ message: 'Please ADD All Fields' })
@@ -43,7 +44,6 @@ const register = asyncHandler(async(req, res) => {
     // Check if user exists
     userExists = await User.findOne({ email })
     const roles = await RoleModel.findOne({ role })
-    console.log(roles);
     if (userExists) {
         res.status(400).json({ message: 'User already exists' })
     }
@@ -71,15 +71,13 @@ const register = asyncHandler(async(req, res) => {
                 user.id,
                 user.verified
             );
-            return res.status(401).send({
+            return res.status(200).send({
                 message: "Pending Account. Please Verify Your Email!"
             })
         }
-
     } else {
         res.status(400).json({ message: 'Invalid user data' })
     }
-
 })
 
 // method : post
@@ -149,13 +147,11 @@ const generateToken = (id) => {
 const Verify = async(req, res) => {
     const token = req.params.token
     const id = req.params.id
-    console.log(id)
-    console.log(token)
     const user = await User.findById(id)
     if (user.verified == false && user.token == token) {
         user.verified = true
         user.save()
-        res.status(200).send('your account is verified')
+        return res.redirect("http://127.0.0.1:5173/login")
     } else {
         res.status(400).send('token not valid')
     }
