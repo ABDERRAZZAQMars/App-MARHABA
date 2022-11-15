@@ -7,7 +7,7 @@ import Login from './Components/Login'
 import Register from './Components/Register'
 import ResetPassword from './Components/ResetPassword'
 import Notfound from './Components/Notfound'
-import { Routes, Route } from 'react-router-dom'
+  import { Routes, Route } from 'react-router-dom'
 import Layout from './Components/Layout'
 
 function App() {
