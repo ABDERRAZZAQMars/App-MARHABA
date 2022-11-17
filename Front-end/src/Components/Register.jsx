@@ -3,6 +3,7 @@ import 'flowbite';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
 
 
 function Register() {
@@ -29,13 +30,14 @@ function Register() {
     };
     axios(configuration)
       .then((result) => {
-        console.log(result.data)
+        toast.success(result.data.message);
+        console.log(result.data.message);
         setRegister(true);
         setError(null);
       })
       .catch((error) => {
+        toast.error(error.response.data.message);
         console.log(error);
-        setError(error.response.data.message);
         setRegister(false);
         error = new Error();
       });
@@ -57,7 +59,7 @@ function Register() {
               </div>
 
               <div className="mt-8">
-                <form onSubmit={(e)=>handleSubmit(e)}>
+                <form onSubmit={(e) => handleSubmit(e)}>
                   <div>
                     <input type="text" name="name" value={name} onChange={(e) => setName(e.target.value)} id="name" placeholder="Full Name" className="block w-full px-4 py-2 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40" />
                   </div>
@@ -91,6 +93,7 @@ function Register() {
           </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
 
   )

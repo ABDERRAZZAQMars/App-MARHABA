@@ -9,20 +9,24 @@ const cookie = require('cookie-parser')
 // method : post
 // url : api/auth/login
 // acces : Public
-const Login = asyncHandler(async(req, res) => {
+const Login = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email }).populate('role')
 
     if (user && (await bcrypt.compare(password, user.password))) {
         const tokengenerat = generateToken(user._id)
         res.cookie('access', tokengenerat)
         if (user.verified == true) {
-            res.json({
+            res.status(200).json({
+                message: 'Welcome to profil',
                 _id: user._id,
                 name: user.name,
                 email: user.email,
-                token: tokengenerat
+                verified: user.verified,
+                token: tokengenerat,
+                role : user.role
             })
+            return res.redirect("http://localhost:5173/profil")
         } else {
             res.status(401).json({ message: 'User not verified' })
         }
@@ -34,7 +38,7 @@ const Login = asyncHandler(async(req, res) => {
 // method : post
 // url : api/auth/register
 // acces : Public
-const register = asyncHandler(async(req, res) => {
+const register = asyncHandler(async (req, res) => {
 
     const { name, email, password, token, verified, role } = req.body
     if (!name || !email || !password) {
@@ -83,20 +87,23 @@ const register = asyncHandler(async(req, res) => {
 // method : post
 // url : api/auth/forgetpassword
 // acces : Public
-const ForgetPassword = asyncHandler(async(req, res) => {
+const ForgetPassword = asyncHandler(async (req, res) => {
     const { email } = req.body
     if (!email) {
         res.status(400).json({
             message: 'Please ADD field'
         })
+        return
     }
     const user = await User.findOne({ email })
     if (user) {
-        const token = generateToken(user._id)
+        let token = generateToken(user._id)
+        token = token.split(".").join("")
         user.token = token
         user.save()
         await resetPasswordEmail(user.name, user.email, user.token)
-        res.status(200).send('plaise check your email for reset your password of email ')
+        res.status(200).send('plaise check your email for reset your password of email')
+        return
     }
     res.status(400).json({ message: 'Invalid email' })
 })
@@ -104,8 +111,9 @@ const ForgetPassword = asyncHandler(async(req, res) => {
 // method : post
 // url : api/auth/resetpassword/:token
 // acces : Public
-const ResetPassword = asyncHandler(async(req, res) => {
+const ResetPassword = asyncHandler(async (req, res) => {
     const token = req.params.token
+    console.log('token', token)
     const { password, password2 } = req.body
     if (!password || !password2) {
         res.status(400).json({
@@ -144,7 +152,7 @@ const generateToken = (id) => {
 }
 
 // Verify Token
-const Verify = async(req, res) => {
+const Verify = async (req, res) => {
     const token = req.params.token
     const id = req.params.id
     const user = await User.findById(id)
